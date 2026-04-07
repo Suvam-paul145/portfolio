@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ContactEmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model ContactSubmission {
+  id            String             @id @default(cuid())
+  name          String             @db.VarChar(120)
+  email         String             @db.VarChar(160)
+  message       String             @db.Text
+  ipAddress     String?            @db.VarChar(64)
+  userAgent     String?            @db.VarChar(512)
+  emailStatus   ContactEmailStatus @default(PENDING)
+  emailedAt     DateTime?
+  deliveryError String?            @db.Text
+  createdAt     DateTime           @default(now())
+
+  @@index([createdAt])
+  @@index([email])
+  @@map("contact_submissions")
+}

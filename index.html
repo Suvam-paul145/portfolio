@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suvam Paul | Portfolio</title>
+  <meta name="description" content="Suvam Paul portfolio featuring AI-powered, full-stack, and health-tech projects from GitHub, with direct GitHub and LinkedIn links." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #070A12;
+      --bg2: #0B1020;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.09);
+      --text: #EAF0FF;
+      --muted: #A9B4D0;
+      --line: rgba(255,255,255,.12);
+      --accent: #7C5CFF;
+      --accent2: #18D5FF;
+      --accent3: #00E6A8;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius: 24px;
+      --radius2: 32px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      border-radius: 4px;
+    }
+
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+    }
+
+    /* Three.js canvas */
+    #hero-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Canvas gradient overlay */
+    .canvas-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(124,92,255,.18), transparent 50%),
+        radial-gradient(ellipse at 80% 10%, rgba(24,213,255,.12), transparent 40%),
+        radial-gradient(ellipse at 60% 80%, rgba(0,230,168,.08), transparent 35%);
+    }
+
+    /* Noise texture overlay */
+    .noise {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Cursor glow */
+    .cursor-glow {
+      position: fixed;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,255,.08), transparent 60%);
+      pointer-events: none;
+      z-index: 3;
+      transform: translate(-50%, -50%);
+      transition: opacity .3s;
+      opacity: 0;
+    }
+    body:hover .cursor-glow { opacity: 1; }
+
+    /* Everything above canvas */
+    .page-content {
+      position: relative;
+      z-index: 10;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .container { width: min(100% - 32px, var(--max)); margin-inline: auto; }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: .55rem;
+      padding: .65rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(124,92,255,.4); }
+      50% { box-shadow: 0 0 0 8px rgba(124,92,255,0); }
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+      padding: 1rem 1.25rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      font-size: .95rem;
+      transition: .3s cubic-bezier(.4,0,.2,1);
+      cursor: pointer;
+      user-select: none;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #08101E;
+      box-shadow: 0 12px 34px rgba(124,92,255,.25);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 16px 44px rgba(124,92,255,.35);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,.04);
+      border-color: var(--line);
+      color: var(--text);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.08); transform: translateY(-2px); }
+    .btn:disabled {
+      opacity: .7;
+      cursor: wait;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .section { padding: 100px 0; }
+    .section-head {
+      display: flex; align-items: end; justify-content: space-between; gap: 24px;
+      margin-bottom: 36px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      letter-spacing: -.04em;
+    }
+    .section-head p { margin: 0; color: var(--muted); max-width: 680px; line-height: 1.7; }
+    .grid { display: grid; gap: 18px; }
+
+    /* Section dividers */
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+      opacity: .3;
+      margin: 0 auto;
+      width: 60%;
+      transform: scaleX(0);
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: sticky; top: 0; z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(7,10,18,.62);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      transition: background .3s, box-shadow .3s;
+    }
+    header.scrolled {
+      background: rgba(7,10,18,.88);
+      box-shadow: 0 4px 30px rgba(0,0,0,.3);
+    }
+    .nav {
+      height: 78px;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+    }
+    .brand-mark {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #08101E;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(124,92,255,.25);
+      transition: transform .3s;
+    }
+    .brand:hover .brand-mark { transform: rotate(-8deg) scale(1.08); }
+    .nav-links {
+      display: flex; align-items: center; gap: 22px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .nav-links a { position: relative; padding: .35rem 0; transition: color .2s; }
+    .nav-links a::after {
+      content: ""; position: absolute; left: 0; bottom: -5px;
+      width: 100%; height: 2px; border-radius: 999px;
+      transform: scaleX(0); transform-origin: left;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      transition: .25s cubic-bezier(.4,0,.2,1);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
+    .menu-btn {
+      display: none;
+      width: 46px; height: 46px; border-radius: 14px;
+      border: 1px solid var(--line); background: rgba(255,255,255,.04);
+      color: var(--text); font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    /* ─── HERO ─── */
+    .hero { padding: 72px 0 20px; position: relative; }
+    .hero-wrap {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      align-items: center;
+      min-height: calc(100vh - 90px);
+    }
+    .hero-copy { padding: 24px 0; }
+    .eyebrow { margin-bottom: 16px; }
+    .hero h1 {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.6rem, 7vw, 5.2rem);
+      line-height: .98;
+      letter-spacing: -.06em;
+      max-width: 14ch;
+    }
+    .gradient {
+      background: linear-gradient(135deg, #fff 0%, #B2C6FF 30%, #7C5CFF 70%, #18D5FF 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .typed-cursor {
+      display: inline-block;
+      width: 3px;
+      height: 1em;
+      background: var(--accent2);
+      margin-left: 4px;
+      animation: blink-cursor .75s steps(1) infinite;
+      vertical-align: text-bottom;
+    }
+    @keyframes blink-cursor { 50% { opacity: 0; } }
+    .hero p {
+      color: var(--muted);
+      max-width: 62ch;
+      font-size: 1.06rem;
+      line-height: 1.8;
+      margin: 18px 0 28px;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
+    .hero-stats {
+      display: grid; grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px; margin-top: 20px;
+    }
+    .stat {
+      padding: 16px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+    }
+    .stat strong { display: block; font-size: 1.4rem; margin-bottom: 6px; font-family: 'Space Grotesk', sans-serif; }
+    .stat span { color: var(--muted); font-size: .92rem; }
+
+    /* Hero card with 3D wrapper */
+    .hero-3d-card {
+      perspective: 1000px;
+    }
+    .hero-card {
+      position: relative;
+      min-height: 640px;
+      padding: 22px;
+      border-radius: var(--radius2);
+      overflow: hidden;
+      transition: transform .4s cubic-bezier(.4,0,.2,1);
+      transform-style: preserve-3d;
+    }
+    .hero-card::before {
+      content: "";
+      position: absolute; inset: -2px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(124,92,255,.35), transparent 22%),
+        radial-gradient(circle at 80% 20%, rgba(24,213,255,.24), transparent 18%),
+        radial-gradient(circle at 50% 80%, rgba(0,230,168,.16), transparent 20%);
+      filter: blur(12px);
+      opacity: .9;
+      pointer-events: none;
+    }
+    .profile {
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .profile-top, .profile-bottom { display: grid; gap: 16px; }
+    .avatar {
+      width: 88px; height: 88px; border-radius: 28px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, rgba(124,92,255,.9), rgba(24,213,255,.85));
+      font-size: 2rem;
+      font-weight: 900;
+      font-family: 'Space Grotesk', sans-serif;
+      color: #08101E;
+      box-shadow: 0 16px 35px rgba(124,92,255,.2);
+      transition: transform .4s;
+    }
+    .avatar:hover { transform: scale(1.08) rotate(-5deg); }
+    .profile-box {
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(4,7,14,.45);
+    }
+    .profile-box h3, .profile-box p { margin: 0; }
+    .profile-box p { color: var(--muted); line-height: 1.7; margin-top: 8px; }
+    .mini-badges { display: flex; flex-wrap: wrap; gap: 10px; }
+    .mini-badges span {
+      padding: .55rem .8rem;
+      border-radius: 999px;
+      font-size: .85rem;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      transition: border-color .3s, background .3s;
+    }
+    .mini-badges span:hover {
+      border-color: rgba(124,92,255,.4);
+      background: rgba(124,92,255,.08);
+    }
+
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(18px);
+      opacity: .28;
+      animation: float 10s ease-in-out infinite;
+    }
+    .orb.one { width: 160px; height: 160px; right: 28px; top: 32px; background: var(--accent); }
+    .orb.two { width: 220px; height: 220px; left: -30px; bottom: 70px; background: var(--accent2); animation-delay: -2.4s; }
+    .orb.three { width: 120px; height: 120px; right: 120px; bottom: 160px; background: var(--accent3); animation-delay: -4.6s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-18px) translateX(12px); }
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+    .chip {
+      padding: .65rem .9rem; border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: .9rem;
+      transition: border-color .3s, transform .2s;
+    }
+    .chip:hover { border-color: rgba(124,92,255,.4); transform: translateY(-2px); }
+
+    /* ─── CARDS ─── */
+    .cards-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .cards-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .card {
+      padding: 22px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      transition: .35s cubic-bezier(.4,0,.2,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover { transform: translateY(-6px); border-color: rgba(124,92,255,.35); }
+
+    /* 3D icon container */
+    .icon-3d {
+      width: 56px; height: 56px; border-radius: 18px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, rgba(124,92,255,.16), rgba(24,213,255,.12));
+      border: 1px solid var(--line);
+      margin-bottom: 14px;
+      font-size: 1.3rem;
+      perspective: 400px;
+      transition: transform .4s;
+    }
+    .card:hover .icon-3d { transform: rotateY(15deg) rotateX(-10deg) scale(1.1); }
+
+    .card h3 { margin: 0 0 10px; font-size: 1.15rem; }
+    .card p { margin: 0; color: var(--muted); line-height: 1.75; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .tag-row span {
+      font-size: .82rem;
+      padding: .45rem .7rem;
+      border-radius: 999px;
+      color: #dfe8ff;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+    }
+
+    /* ─── PROJECTS ─── */
+    .project-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .project { padding: 0; overflow: hidden; }
+    .project-top { padding: 22px 22px 0; }
+    .project-top h3 { margin-bottom: 10px; }
+    .project-media {
+      margin-top: 18px;
+      height: 220px;
+      border-top: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .project-media canvas {
+      width: 100%;
+      height: 100%;
+    }
+    .project-meta {
+      display: flex; justify-content: space-between; gap: 12px;
+      padding: 18px 22px 22px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .project-meta small { color: var(--muted); }
+    .project-links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .project-links a {
+      padding: .75rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      transition: background .2s, border-color .2s;
+    }
+    .project-links a:hover {
+      background: rgba(124,92,255,.12);
+      border-color: rgba(124,92,255,.4);
+    }
+
+    /* ─── TIMELINE ─── */
+    .timeline { position: relative; padding-left: 20px; }
+    .timeline::before {
+      content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px;
+      width: 2px; background: linear-gradient(180deg, var(--accent), var(--accent2));
+      opacity: .55;
+    }
+    .step {
+      position: relative;
+      margin-bottom: 18px;
+      padding: 18px 18px 18px 22px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      transition: border-color .3s;
+    }
+    .step:hover { border-color: rgba(124,92,255,.3); }
+    .step::before {
+      content: ""; position: absolute; left: -24px; top: 24px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 0 6px rgba(124,92,255,.12);
+    }
+    .step h4 { margin: 0 0 8px; }
+    .step p { margin: 0; color: var(--muted); line-height: 1.7; }
+
+    /* ─── CONTACT ─── */
+    .contact {
+      display: grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 18px;
+      align-items: start;
+    }
+    form { display: grid; gap: 14px; }
+    .field { display: grid; gap: 8px; }
+    label { font-weight: 700; color: #dfe8ff; font-size: .93rem; }
+    input, textarea {
+      width: 100%;
+      padding: 1rem 1.05rem;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      outline: none;
+      font: inherit;
+      resize: vertical;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    input::placeholder, textarea::placeholder { color: #8d97b3; }
+    input:focus, textarea:focus {
+      border-color: rgba(24,213,255,.45);
+      box-shadow: 0 0 0 4px rgba(24,213,255,.10);
+    }
+    .form-status {
+      min-height: 24px;
+      font-size: .94rem;
+      color: var(--muted);
+    }
+    .form-status[data-state="success"] { color: #77f2bf; }
+    .form-status[data-state="error"] { color: #ff9aa8; }
+    .honeypot {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .contact-links { display: grid; gap: 12px; margin-top: 14px; }
+    .contact-link {
+      padding: 1rem 1.05rem;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: border-color .3s, transform .2s;
+    }
+    .contact-link:hover {
+      border-color: rgba(124,92,255,.3);
+      transform: translateX(4px);
+    }
+    .contact-link span { color: var(--muted); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 26px 0 40px;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,.08);
+      margin-top: 28px;
+    }
+    .footer-row {
+      display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ─── GSAP reveal class ─── */
+    .gs-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      will-change: transform, opacity;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+      .hero-wrap, .contact, .project-grid, .cards-3, .cards-2 { grid-template-columns: 1fr; }
+      .hero-card { min-height: 520px; }
+      .section { padding: 78px 0; }
+      .section-head { align-items: start; flex-direction: column; }
+      .hero h1 { max-width: 14ch; }
+    }
+    @media (max-width: 760px) {
+      .nav-links {
+        position: fixed;
+        top: 78px; left: 16px; right: 16px;
+        display: grid;
+        gap: 0;
+        padding: 12px;
+        border-radius: 24px;
+        background: rgba(7,10,18,.92);
+        border: 1px solid var(--line);
+        backdrop-filter: blur(18px);
+        transform: translateY(-14px);
+        opacity: 0; pointer-events: none;
+        transition: .25s cubic-bezier(.4,0,.2,1);
+      }
+      .nav-links.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+      .nav-links a {
+        padding: 14px 12px;
+        border-radius: 14px;
+      }
+      .nav-links a:hover { background: rgba(255,255,255,.05); }
+      .menu-btn { display: inline-grid; place-items: center; }
+      .hero { padding-top: 48px; }
+      .hero-stats { grid-template-columns: 1fr; }
+      .hero h1 { font-size: clamp(2.4rem, 13vw, 4.6rem); }
+      .project-media { height: 180px; }
+      .cursor-glow { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Three.js background canvas -->
+  <canvas id="hero-canvas"></canvas>
+  <div class="canvas-overlay"></div>
+  <div class="noise"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <div class="page-content">
+    <!-- ─── HEADER ─── -->
+    <header id="siteHeader">
+      <div class="container nav">
+        <a href="#home" class="brand">
+          <div class="brand-mark">SP</div>
+          <div>
+            <div>Suvam Paul</div>
+            <small style="color:var(--muted); font-weight:600;">AI &bull; Full Stack &bull; Open Source</small>
+          </div>
+        </a>
+
+        <nav class="nav-links" id="navLinks">
+          <a href="#home" class="active">Home</a>
+          <a href="#about">About</a>
+          <a href="#projects">Projects</a>
+          <a href="#opensource">Open Source</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu">&#9776;</button>
+      </div>
+    </header>
+
+    <!-- ─── HERO ─── -->
+    <main id="home" class="hero">
+      <div class="container hero-wrap">
+        <section class="hero-copy gs-reveal">
+          <div class="pill eyebrow"><span class="dot"></span> AI-powered builder shipping full-stack products</div>
+          <h1>Building <span class="gradient" id="typedTarget">intelligent systems</span><span class="typed-cursor"></span></h1>
+          <p>
+            I am Suvam Paul, a CSE student building AI-integrated web products across healthcare, developer
+            tooling, analytics, and productivity. My work blends modern frontend execution with backend
+            architecture, cloud services, and practical problem-solving.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#projects">View featured projects</a>
+            <a class="btn btn-ghost" href="https://github.com/Suvam-paul145" target="_blank" rel="noreferrer">GitHub profile</a>
+          </div>
+
+          <div class="chips" aria-label="Highlights">
+            <span class="chip">AI Products</span>
+            <span class="chip">Full-Stack Systems</span>
+            <span class="chip">AWS + Cloud</span>
+            <span class="chip">Healthcare Tech</span>
+            <span class="chip">Open Source</span>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat glass" data-tilt>
+              <strong><span data-count="79">0</span>+</strong>
+              <span>Public repositories on GitHub</span>
+            </div>
+            <div class="stat glass" data-tilt>
+              <strong>AI + Web</strong>
+              <span>Production-minded apps with real use cases</span>
+            </div>
+            <div class="stat glass" data-tilt>
+              <strong>Builder</strong>
+              <span>Open source, hackathons, and shipping fast</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="hero-3d-card gs-reveal" data-tilt>
+          <div class="hero-card glass">
+            <div class="orb one"></div>
+            <div class="orb two"></div>
+            <div class="orb three"></div>
+
+            <div class="profile">
+              <div class="profile-top">
+                <div class="avatar">SP</div>
+                <div class="profile-box">
+                  <h3>About me</h3>
+                  <p>
+                    I am growing into an AI-powered backend full-stack engineer, with strong interest in
+                    authentication, intelligent workflows, cloud deployment, and interfaces that feel polished.
+                  </p>
+                </div>
+                <div class="profile-box">
+                  <h3>What I am building now</h3>
+                  <p>
+                    Current GitHub work spans medical communication tools, analytics assistants, AI coding tutors,
+                    developer OS automation, and productivity systems with smart reminders.
+                  </p>
+                </div>
+              </div>
+
+              <div class="profile-bottom">
+                <div class="mini-badges">
+                  <span>Web Developer</span>
+                  <span>AWS</span>
+                  <span>Machine Learning</span>
+                  <span>Developer Program Member</span>
+                </div>
+                <div class="profile-box">
+                  <h3>LinkedIn</h3>
+                  <p><a href="https://www.linkedin.com/in/suvam-paul-03222005az/" target="_blank" rel="noreferrer">linkedin.com/in/suvam-paul-03222005az</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <div class="section-divider"></div>
+
+    <!-- ─── ABOUT ─── -->
+    <section id="about" class="section">
+      <div class="container">
+        <div class="section-head gs-reveal">
+          <div>
+            <h2>About &amp; strengths</h2>
+            <p>
+              The strongest pattern across your public work is clear: you like products that combine AI,
+              practical UX, backend logic, and visible real-world value.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid cards-3">
+          <article class="card gs-reveal" data-tilt>
+            <div class="icon-3d">&#9889;</div>
+            <h3>AI-integrated product building</h3>
+            <p>I build apps where the UI is only one layer of the product, backed by automation, LLM workflows, and task-driven systems.</p>
+            <div class="tag-row">
+              <span>LLMs</span><span>FastAPI</span><span>React</span><span>Automation</span>
+            </div>
+          </article>
+
+          <article class="card gs-reveal" data-tilt>
+            <div class="icon-3d">&#127912;</div>
+            <h3>Full-stack engineering mindset</h3>
+            <p>Repositories show comfort with frontend apps, APIs, databases, auth flows, dashboards, and deployment-ready architecture.</p>
+            <div class="tag-row">
+              <span>TypeScript</span><span>Node.js</span><span>Python</span><span>MongoDB</span>
+            </div>
+          </article>
+
+          <article class="card gs-reveal" data-tilt>
+            <div class="icon-3d">&#128640;</div>
+            <h3>Cloud and launch readiness</h3>
+            <p>Several projects already ship with live demos, cloud services, or deployment targets across Vercel, AWS, and similar tooling.</p>
+            <div class="tag-row">
+              <span>AWS</span><span>Vercel</span><span>Render</span><span>Open Source</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ─── PROJECTS ─── -->
+    <section id="projects" class="section">
+      <div class="container">
+        <div class="section-head gs-reveal">
+          <div>
+            <h2>Featured GitHub projects</h2>
+            <p>
+              These were selected from your public GitHub profile using a mix of visibility, originality,
+              activity, and how well they represent your strongest work.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid project-grid">
+          <article class="card project gs-reveal" data-tilt>
+            <div class="project-top">
+              <h3>SwasthaLink</h3>
+              <p>
+                A full-stack medical communication platform that converts discharge summaries into plain,
+                bilingual explanations and delivers them through patient-friendly workflows.
+              </p>
+              <div class="tag-row">
+                <span>Healthcare AI</span><span>FastAPI</span><span>React</span><span>WhatsApp</span>
+              </div>
+            </div>
+            <div class="project-media" data-project="health"></div>
+            <div class="project-meta">
+              <small>Top public repo by stars, forks, and current activity</small>
+              <div class="project-links">
+                <a href="https://github.com/Suvam-paul145/SwasthaLink" target="_blank" rel="noreferrer">GitHub</a>
+                <a href="https://swastha-link-psi.vercel.app" target="_blank" rel="noreferrer">Live demo</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card project gs-reveal" data-tilt>
+            <div class="project-top">
+              <h3>DEV.OS</h3>
+              <p>
+                An AI-powered operating system assistant that connects a modern interface, backend orchestration,
+                Gemini-powered reasoning, and local OS automation.
+              </p>
+              <div class="tag-row">
+                <span>AI Assistant</span><span>TypeScript</span><span>Python</span><span>Microservices</span>
+              </div>
+            </div>
+            <div class="project-media" data-project="devos"></div>
+            <div class="project-meta">
+              <small>One of your strongest concept-to-system builds</small>
+              <div class="project-links">
+                <a href="https://github.com/Suvam-paul145/Dev-AI-OS-assistant" target="_blank" rel="noreferrer">GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card project gs-reveal" data-tilt>
+            <div class="project-top">
+              <h3>KaryaSetu</h3>
+              <p>
+                A full-stack productivity platform with task management, reminders, authentication, and AI-assisted
+                task suggestions designed to reduce manual workflow friction.
+              </p>
+              <div class="tag-row">
+                <span>Productivity</span><span>TypeScript</span><span>MongoDB</span><span>AWS</span>
+              </div>
+            </div>
+            <div class="project-media" data-project="productivity"></div>
+            <div class="project-meta">
+              <small>Balanced example of product UX plus backend depth</small>
+              <div class="project-links">
+                <a href="https://github.com/Suvam-paul145/KaryaSetu" target="_blank" rel="noreferrer">GitHub</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card project gs-reveal" data-tilt>
+            <div class="project-top">
+              <h3>MediParse.AI</h3>
+              <p>
+                A medical document extraction and analysis app that uses Gemini-powered vision workflows to
+                turn unstructured prescriptions and reports into structured insight.
+              </p>
+              <div class="tag-row">
+                <span>Gemini 2.5</span><span>Medical OCR</span><span>React</span><span>Vite</span>
+              </div>
+            </div>
+            <div class="project-media" data-project="mediparse"></div>
+            <div class="project-meta">
+              <small>Featured health-tech build with live deployment</small>
+              <div class="project-links">
+                <a href="https://github.com/Suvam-paul145/Medical-Doccument-Extraction" target="_blank" rel="noreferrer">GitHub</a>
+                <a href="https://medi-parse-your-personal-medical-as.vercel.app" target="_blank" rel="noreferrer">Live demo</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card project gs-reveal" data-tilt>
+            <div class="project-top">
+              <h3>Narralytics</h3>
+              <p>
+                A data storytelling and analytics product that helps people ask better questions of their data
+                without needing SQL-heavy workflows or traditional BI complexity.
+              </p>
+              <div class="tag-row">
+                <span>Analytics</span><span>React</span><span>Python</span><span>Docker</span>
+              </div>
+            </div>
+            <div class="project-media" data-project="analytics"></div>
+            <div class="project-meta">
+              <small>Strong signal from recent activity plus forks</small>
+              <div class="project-links">
+                <a href="https://github.com/Suvam-paul145/Narralytics" target="_blank" rel="noreferrer">GitHub</a>
+                <a href="https://narralytics-git-testing-suvam-paul145s-projects.vercel.app/" target="_blank" rel="noreferrer">Live demo</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ─── OPEN SOURCE ─── -->
+    <section id="opensource" class="section">
+      <div class="container">
+        <div class="section-head gs-reveal">
+          <div>
+            <h2>Open source &amp; collaboration</h2>
+            <p>
+              Your public profile already signals that you like building in the open, learning fast, and working
+              on ideas that mix engineering depth with strong usability.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid cards-2">
+          <article class="card gs-reveal" data-tilt>
+            <div class="icon-3d">&#127758;</div>
+            <h3>Open source collaboration</h3>
+            <p>
+              I am open to contributing to AI-first products, frontend experiences, backend systems,
+              developer tools, and projects where product clarity matters as much as code quality.
+            </p>
+            <div class="tag-row">
+              <span>AI apps</span><span>Frontend</span><span>Backend</span><span>Developer tools</span>
+            </div>
+          </article>
+
+          <article class="card gs-reveal" data-tilt>
+            <div class="icon-3d">&#127908;</div>
+            <h3>Hackathons and collaboration</h3>
+            <p>
+              I enjoy student-builder spaces, rapid prototyping, and turning ambitious ideas into demos that
+              people can actually try, test, and improve.
+            </p>
+            <div class="tag-row">
+              <span>Hackathons</span><span>Rapid shipping</span><span>Brainstorming</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid" style="margin-top:18px;">
+          <div class="card gs-reveal">
+            <div class="timeline">
+              <div class="step">
+                <h4>1. Find the friction</h4>
+                <p>Start with a painful workflow, a communication gap, or an overlooked user problem.</p>
+              </div>
+              <div class="step">
+                <h4>2. Build the system</h4>
+                <p>Design the UI, the backend flow, and the intelligence layer so the product feels complete.</p>
+              </div>
+              <div class="step">
+                <h4>3. Ship and iterate</h4>
+                <p>Push a usable version live, collect feedback, and keep improving in public.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ─── CONTACT ─── -->
+    <section id="contact" class="section">
+      <div class="container">
+        <div class="section-head gs-reveal">
+          <div>
+            <h2>Contact</h2>
+            <p>
+              Best places to reach me, follow my work, and explore what I am building right now.
+            </p>
+          </div>
+        </div>
+
+        <div class="contact">
+          <div class="card gs-reveal">
+            <h3>Send a message</h3>
+            <p style="margin-bottom:18px;">Messages submitted here are stored in Supabase through Prisma and sent straight to your inbox.</p>
+
+            <form id="contactForm">
+              <input class="honeypot" id="website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+              <div class="field">
+                <label for="name">Name</label>
+                <input id="name" name="name" type="text" placeholder="Your name" autocomplete="name" maxlength="120" required />
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" maxlength="160" required />
+              </div>
+              <div class="field">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="5" placeholder="Tell me about your project, collaboration, or idea." maxlength="5000" required></textarea>
+              </div>
+              <button class="btn btn-primary" id="contactSubmitBtn" type="submit">Send message</button>
+              <p class="form-status" id="formStatus" aria-live="polite"></p>
+            </form>
+          </div>
+
+          <div class="card gs-reveal">
+            <h3>Direct links</h3>
+            <p>Use these links to connect, review my repositories, or jump into a live project.</p>
+
+            <div class="contact-links">
+              <a class="contact-link" href="https://www.linkedin.com/in/suvam-paul-03222005az/" target="_blank" rel="noreferrer">
+                <strong>LinkedIn</strong>
+                <span>in/suvam-paul-03222005az</span>
+              </a>
+              <a class="contact-link" href="https://github.com/Suvam-paul145" target="_blank" rel="noreferrer">
+                <strong>GitHub</strong>
+                <span>github.com/Suvam-paul145</span>
+              </a>
+              <a class="contact-link" href="https://swastha-link-psi.vercel.app" target="_blank" rel="noreferrer">
+                <strong>Latest live app</strong>
+                <span>SwasthaLink</span>
+              </a>
+            </div>
+
+            <div class="profile-box" style="margin-top:18px;">
+              <h3>One-line positioning</h3>
+              <p>
+                I build AI-powered full-stack products that turn complex workflows into usable, real-world systems.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-row">
+        <div>&copy; <span id="year"></span> Suvam Paul. Built with HTML, CSS, JavaScript &amp; Three.js.</div>
+        <div>Portfolio &bull; AI Products &bull; Full Stack Engineering</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    /* ══════════════════════════════════════════════
+       1. THREE.JS — Floating 3D Geometry Background
+       ══════════════════════════════════════════════ */
+    const canvas = document.getElementById('hero-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 30;
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+    scene.add(ambientLight);
+    const dirLight = new THREE.DirectionalLight(0x7C5CFF, 0.6);
+    dirLight.position.set(5, 10, 7);
+    scene.add(dirLight);
+    const pointLight1 = new THREE.PointLight(0x18D5FF, 0.8, 60);
+    pointLight1.position.set(-10, 5, 10);
+    scene.add(pointLight1);
+    const pointLight2 = new THREE.PointLight(0x00E6A8, 0.5, 50);
+    pointLight2.position.set(10, -5, 5);
+    scene.add(pointLight2);
+
+    // Floating shapes
+    const shapeMaterial = (color) => new THREE.MeshPhongMaterial({
+      color,
+      transparent: true,
+      opacity: 0.35,
+      wireframe: true,
+      shininess: 80
+    });
+
+    const shapes = [];
+    const shapeConfigs = [
+      { geo: new THREE.IcosahedronGeometry(2, 0), color: 0x7C5CFF, pos: [-12, 8, -5] },
+      { geo: new THREE.OctahedronGeometry(1.8, 0), color: 0x18D5FF, pos: [14, -6, -8] },
+      { geo: new THREE.TetrahedronGeometry(2.2, 0), color: 0x00E6A8, pos: [-8, -10, -3] },
+      { geo: new THREE.TorusGeometry(1.6, 0.5, 8, 16), color: 0x7C5CFF, pos: [10, 10, -10] },
+      { geo: new THREE.DodecahedronGeometry(1.5, 0), color: 0x18D5FF, pos: [-14, 2, -12] },
+      { geo: new THREE.TorusKnotGeometry(1.2, 0.35, 64, 8), color: 0x00E6A8, pos: [6, -12, -6] },
+      { geo: new THREE.BoxGeometry(2, 2, 2), color: 0x7C5CFF, pos: [-4, 14, -8] },
+      { geo: new THREE.IcosahedronGeometry(1.3, 1), color: 0x18D5FF, pos: [16, 4, -14] }
+    ];
+
+    shapeConfigs.forEach(cfg => {
+      const mesh = new THREE.Mesh(cfg.geo, shapeMaterial(cfg.color));
+      mesh.position.set(...cfg.pos);
+      mesh.userData = {
+        rotSpeed: { x: (Math.random() - 0.5) * 0.008, y: (Math.random() - 0.5) * 0.008 },
+        floatSpeed: 0.3 + Math.random() * 0.5,
+        floatAmp: 0.8 + Math.random() * 1.2,
+        baseY: cfg.pos[1]
+      };
+      scene.add(mesh);
+      shapes.push(mesh);
+    });
+
+    // Particles
+    const particleCount = 200;
+    const particlesGeo = new THREE.BufferGeometry();
+    const pPositions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount * 3; i++) {
+      pPositions[i] = (Math.random() - 0.5) * 60;
+    }
+    particlesGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+    const particleMat = new THREE.PointsMaterial({ color: 0x7C5CFF, size: 0.08, transparent: true, opacity: 0.6 });
+    const particles = new THREE.Points(particlesGeo, particleMat);
+    scene.add(particles);
+
+    // Mouse tracking
+    const mouse = { x: 0, y: 0 };
+    document.addEventListener('mousemove', (e) => {
+      mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    // Animation loop
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+
+      shapes.forEach(mesh => {
+        mesh.rotation.x += mesh.userData.rotSpeed.x;
+        mesh.rotation.y += mesh.userData.rotSpeed.y;
+        mesh.position.y = mesh.userData.baseY + Math.sin(elapsed * mesh.userData.floatSpeed) * mesh.userData.floatAmp;
+      });
+
+      particles.rotation.y = elapsed * 0.02;
+      particles.rotation.x = elapsed * 0.01;
+
+      // Subtle camera follow mouse
+      camera.position.x += (mouse.x * 3 - camera.position.x) * 0.02;
+      camera.position.y += (-mouse.y * 2 - camera.position.y) * 0.02;
+      camera.lookAt(0, 0, 0);
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    /* ══════════════════════════════════════════════
+       2. MINI 3D SCENES — Project Cards
+       ══════════════════════════════════════════════ */
+    const projectConfigs = {
+      health: { geo: () => new THREE.IcosahedronGeometry(1.8, 1), color: 0x00E6A8, wireColor: 0x00E6A8 },
+      devos: { geo: () => new THREE.BoxGeometry(2.2, 2.2, 2.2), color: 0x18D5FF, wireColor: 0x18D5FF },
+      productivity: { geo: () => new THREE.OctahedronGeometry(2, 0), color: 0x7C5CFF, wireColor: 0x7C5CFF },
+      mediparse: { geo: () => new THREE.TorusGeometry(1.5, 0.5, 16, 32), color: 0xFF6B9D, wireColor: 0xFF6B9D },
+      analytics: { geo: () => new THREE.TorusKnotGeometry(1.2, 0.4, 64, 8), color: 0xFFAA33, wireColor: 0xFFAA33 }
+    };
+
+    document.querySelectorAll('.project-media[data-project]').forEach(container => {
+      const key = container.dataset.project;
+      const cfg = projectConfigs[key];
+      if (!cfg) return;
+
+      const miniCanvas = document.createElement('canvas');
+      miniCanvas.style.width = '100%';
+      miniCanvas.style.height = '100%';
+      container.appendChild(miniCanvas);
+
+      const w = container.offsetWidth || 300;
+      const h = container.offsetHeight || 220;
+
+      const miniRenderer = new THREE.WebGLRenderer({ canvas: miniCanvas, alpha: true, antialias: true });
+      miniRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      miniRenderer.setSize(w, h);
+
+      const miniScene = new THREE.Scene();
+      const miniCam = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
+      miniCam.position.z = 6;
+
+      miniScene.add(new THREE.AmbientLight(0xffffff, 0.4));
+      const ml = new THREE.PointLight(cfg.color, 1.2, 30);
+      ml.position.set(3, 3, 5);
+      miniScene.add(ml);
+
+      const mesh = new THREE.Mesh(
+        cfg.geo(),
+        new THREE.MeshPhongMaterial({ color: cfg.color, transparent: true, opacity: 0.25, wireframe: true })
+      );
+      miniScene.add(mesh);
+
+      // Orbiting small shapes
+      const orbitGroup = new THREE.Group();
+      for (let i = 0; i < 4; i++) {
+        const small = new THREE.Mesh(
+          new THREE.TetrahedronGeometry(0.3, 0),
+          new THREE.MeshPhongMaterial({ color: cfg.wireColor, transparent: true, opacity: 0.5 })
+        );
+        const angle = (i / 4) * Math.PI * 2;
+        small.position.set(Math.cos(angle) * 3, Math.sin(angle) * 3, 0);
+        orbitGroup.add(small);
+      }
+      miniScene.add(orbitGroup);
+
+      function miniAnimate() {
+        requestAnimationFrame(miniAnimate);
+        const t = clock.getElapsedTime();
+        mesh.rotation.x = t * 0.3;
+        mesh.rotation.y = t * 0.5;
+        orbitGroup.rotation.z = t * 0.4;
+        orbitGroup.rotation.x = t * 0.2;
+        miniRenderer.render(miniScene, miniCam);
+      }
+      miniAnimate();
+    });
+
+    /* ══════════════════════════════════════════════
+       3. GSAP — ScrollTrigger Reveal Animations
+       ══════════════════════════════════════════════ */
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.utils.toArray('.gs-reveal').forEach((el, i) => {
+      gsap.fromTo(el,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1, y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          delay: i * 0.05,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 88%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+    });
+
+    // Section dividers
+    gsap.utils.toArray('.section-divider').forEach(div => {
+      gsap.to(div, {
+        scaleX: 1,
+        duration: 1.2,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: div,
+          start: 'top 90%',
+          toggleActions: 'play none none none'
+        }
+      });
+    });
+
+    /* ══════════════════════════════════════════════
+       4. TYPED TEXT EFFECT
+       ══════════════════════════════════════════════ */
+    const typedEl = document.getElementById('typedTarget');
+    const phrases = [
+      'intelligent systems',
+      'smart digital experiences',
+      'futuristic interfaces',
+      'product-grade prototypes',
+      'real-world solutions'
+    ];
+    let phraseIdx = 0, charIdx = 0, isDeleting = false;
+
+    function typeEffect() {
+      const current = phrases[phraseIdx];
+      if (!isDeleting) {
+        typedEl.textContent = current.substring(0, charIdx + 1);
+        charIdx++;
+        if (charIdx === current.length) {
+          isDeleting = true;
+          setTimeout(typeEffect, 2000);
+          return;
+        }
+        setTimeout(typeEffect, 70 + Math.random() * 40);
+      } else {
+        typedEl.textContent = current.substring(0, charIdx - 1);
+        charIdx--;
+        if (charIdx === 0) {
+          isDeleting = false;
+          phraseIdx = (phraseIdx + 1) % phrases.length;
+          setTimeout(typeEffect, 400);
+          return;
+        }
+        setTimeout(typeEffect, 35);
+      }
+    }
+    setTimeout(typeEffect, 2500);
+
+    /* ══════════════════════════════════════════════
+       5. ANIMATED NUMBER COUNTERS
+       ══════════════════════════════════════════════ */
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const target = parseInt(el.dataset.count, 10);
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 90%',
+        once: true,
+        onEnter: () => {
+          gsap.to({ val: 0 }, {
+            val: target,
+            duration: 2,
+            ease: 'power2.out',
+            onUpdate: function() {
+              el.textContent = Math.round(this.targets()[0].val);
+            }
+          });
+        }
+      });
+    });
+
+    /* ══════════════════════════════════════════════
+       6. 3D TILT EFFECT ON CARDS
+       ══════════════════════════════════════════════ */
+    document.querySelectorAll('[data-tilt]').forEach(el => {
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        el.style.transform = `perspective(800px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-4px)`;
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) translateY(0)';
+        el.style.transition = 'transform .5s cubic-bezier(.4,0,.2,1)';
+      });
+      el.addEventListener('mouseenter', () => {
+        el.style.transition = 'transform .1s ease-out';
+      });
+    });
+
+    /* ══════════════════════════════════════════════
+       7. CURSOR GLOW FOLLOWER
+       ══════════════════════════════════════════════ */
+    const glow = document.getElementById('cursorGlow');
+    document.addEventListener('mousemove', (e) => {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    });
+
+    /* ══════════════════════════════════════════════
+       8. HEADER SCROLL EFFECT
+       ══════════════════════════════════════════════ */
+    const header = document.getElementById('siteHeader');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    /* ══════════════════════════════════════════════
+       9. NAVIGATION — Mobile menu + active tracking
+       ══════════════════════════════════════════════ */
+    const menuBtn = document.getElementById('menuBtn');
+    const navLinks = document.getElementById('navLinks');
+
+    menuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+
+    // Close on link click
+    navLinks.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => navLinks.classList.remove('open'));
+    });
+
+    // Active section tracking
+    const sections = document.querySelectorAll('main, section[id]');
+    const navAs = navLinks.querySelectorAll('a');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navAs.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { rootMargin: '-30% 0px -70% 0px' });
+    sections.forEach(s => observer.observe(s));
+
+    /* ══════════════════════════════════════════════
+       10. MISC — Year, Contact form
+       ══════════════════════════════════════════════ */
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const contactForm = document.getElementById('contactForm');
+    const contactSubmitBtn = document.getElementById('contactSubmitBtn');
+    const formStatus = document.getElementById('formStatus');
+
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(contactForm);
+      const payload = Object.fromEntries(formData.entries());
+
+      formStatus.dataset.state = '';
+      formStatus.textContent = 'Sending your message...';
+      contactSubmitBtn.disabled = true;
+      contactSubmitBtn.textContent = 'Sending...';
+
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Something went wrong while sending your message.');
+        }
+
+        formStatus.dataset.state = 'success';
+        formStatus.textContent = result.message || 'Message sent successfully.';
+        contactForm.reset();
+      } catch (error) {
+        formStatus.dataset.state = 'error';
+        formStatus.textContent = error.message || 'Unable to send message right now.';
+      } finally {
+        contactSubmitBtn.disabled = false;
+        contactSubmitBtn.textContent = 'Send message';
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>
