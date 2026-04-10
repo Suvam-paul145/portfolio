@@ -508,8 +508,9 @@
       transform-origin: center bottom;
       opacity: .2;
       mix-blend-mode: screen;
-      filter: hue-rotate(185deg) saturate(1.22) brightness(1.18) contrast(1.06)
-              drop-shadow(0 20px 46px rgba(24,213,255,.3));
+      filter:
+        hue-rotate(185deg) saturate(1.22) brightness(1.18) contrast(1.06)
+        drop-shadow(0 20px 46px rgba(24,213,255,.3));
       -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0) 2%, rgba(0,0,0,.78) 35%, rgba(0,0,0,.9) 100%);
       mask-image: linear-gradient(180deg, rgba(0,0,0,0) 2%, rgba(0,0,0,.78) 35%, rgba(0,0,0,.9) 100%);
       pointer-events: none;
@@ -1629,7 +1630,7 @@
           } else {
             console.error('Journey section image failed and no valid fallback remained:', { className: img.className, failedSrc: img.getAttribute('src') });
           }
-        }, { once: true });
+        });
       });
 
       ScrollTrigger.matchMedia({
