@@ -1002,7 +1002,7 @@
             <div class="journey-visual-card glass">
               <div class="journey-grid">
                 <div class="journey-stage">
-                  <img class="journey-clone" src="/images/avatar-portrait-cutout.png" data-local-src="./images/avatar-portrait-cutout.png" aria-hidden="true" />
+                  <img class="journey-clone" src="/images/avatar-portrait-cutout.png" data-local-src="./images/avatar-portrait-cutout.png" alt="" aria-hidden="true" />
                   <div class="journey-portrait-frame" id="journeyRotor">
                     <img class="journey-portrait" src="/images/avatar-portrait-cutout.png" data-local-src="./images/avatar-portrait-cutout.png" alt="Portrait artwork of Suvam Paul" />
                   </div>
@@ -1616,6 +1616,7 @@
         img.addEventListener('error', () => {
           const localSrc = img.getAttribute('data-local-src');
           if (localSrc) {
+            console.warn('Primary journey image failed to load, falling back to local path:', img.getAttribute('src'));
             img.src = localSrc;
           }
         }, { once: true });
