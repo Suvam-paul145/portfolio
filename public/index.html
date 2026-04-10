@@ -1616,7 +1616,10 @@
         img.addEventListener('error', () => {
           const localSrc = img.getAttribute('data-local-src');
           if (localSrc) {
-            console.warn('Journey section image failed to load, falling back to local path:', img.getAttribute('src'));
+            console.warn(
+              'Journey section image failed to load, falling back to local path:',
+              { className: img.className, failedSrc: img.getAttribute('src') }
+            );
             img.src = localSrc;
           }
         }, { once: true });
