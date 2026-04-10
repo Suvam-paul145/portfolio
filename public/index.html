@@ -398,6 +398,231 @@
     }
     .chip:hover { border-color: rgba(124,92,255,.4); transform: translateY(-2px); }
 
+    .hero-journey {
+      margin-top: 44px;
+      padding: 12px 0 8px;
+    }
+    .journey-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+    .journey-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: .55rem .9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(24,213,255,.2);
+      background: rgba(24,213,255,.08);
+      color: #9FEFFF;
+      font-size: .78rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .journey-kicker::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent2), var(--accent3));
+      box-shadow: 0 0 0 5px rgba(24,213,255,.12);
+    }
+    .journey-heading h2 {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 3.1rem);
+      line-height: 1.02;
+      letter-spacing: -.05em;
+      max-width: 13ch;
+    }
+    .journey-heading p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 58ch;
+      line-height: 1.8;
+    }
+    .journey-shell {
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+      gap: 24px;
+      align-items: start;
+    }
+    .journey-stage-wrap {
+      position: sticky;
+      top: 106px;
+    }
+    .journey-visual-card {
+      position: relative;
+      min-height: 580px;
+      padding: 28px;
+      border-radius: var(--radius2);
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 24% 20%, rgba(124,92,255,.16), transparent 32%),
+        radial-gradient(circle at 76% 68%, rgba(0,230,168,.13), transparent 28%),
+        linear-gradient(180deg, rgba(10,14,26,.88), rgba(7,10,18,.76));
+    }
+    .journey-visual-card::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,.06);
+      pointer-events: none;
+    }
+    .journey-visual-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 10% 18px;
+      height: 110px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(24,213,255,.14), transparent 68%);
+      filter: blur(22px);
+      pointer-events: none;
+    }
+    .journey-grid {
+      position: relative;
+      min-height: 500px;
+      display: flex;
+      align-items: end;
+      justify-content: center;
+    }
+    .journey-stage {
+      position: relative;
+      width: min(100%, 420px);
+      min-height: 470px;
+      perspective: 1400px;
+      transform-style: preserve-3d;
+    }
+    .journey-clone {
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      width: min(56%, 230px);
+      transform: translateX(-86%) scale(.88);
+      transform-origin: center bottom;
+      opacity: .12;
+      mix-blend-mode: screen;
+      filter: saturate(1.1) brightness(1.08) drop-shadow(0 18px 42px rgba(24,213,255,.18));
+      pointer-events: none;
+      z-index: 1;
+    }
+    .journey-portrait-frame {
+      position: relative;
+      width: min(100%, 350px);
+      margin-inline: auto;
+      transform-style: preserve-3d;
+      transform-origin: 35% center;
+      will-change: transform;
+      filter: drop-shadow(0 18px 44px rgba(7,10,18,.55));
+      z-index: 2;
+    }
+    .journey-portrait-frame::before {
+      content: "";
+      position: absolute;
+      inset: 12% 10% 4%;
+      border-radius: 36px;
+      background: linear-gradient(180deg, rgba(124,92,255,.18), rgba(24,213,255,.06));
+      filter: blur(40px);
+      transform: translateZ(-30px);
+      z-index: -1;
+    }
+    .journey-portrait {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .journey-caption {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 24px;
+      display: grid;
+      gap: 6px;
+      z-index: 3;
+    }
+    .journey-caption span {
+      color: #9FEFFF;
+      font-size: .76rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .journey-caption strong {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.12rem;
+      line-height: 1.35;
+    }
+    .journey-roadmap {
+      position: relative;
+      padding: 18px 0 18px 30px;
+    }
+    .journey-roadmap::before {
+      content: "";
+      position: absolute;
+      left: 9px;
+      top: 14px;
+      bottom: 14px;
+      width: 2px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(124,92,255,.12), rgba(124,92,255,.88), rgba(24,213,255,.85), rgba(0,230,168,.55));
+      opacity: .9;
+    }
+    .journey-step {
+      position: relative;
+      margin-bottom: 18px;
+      padding: 20px 20px 18px 24px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+      transition: transform .3s, border-color .3s, box-shadow .3s;
+    }
+    .journey-step:last-child { margin-bottom: 0; }
+    .journey-step::before {
+      content: "";
+      position: absolute;
+      left: -28px;
+      top: 26px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 0 7px rgba(124,92,255,.10);
+    }
+    .journey-step.is-active {
+      border-color: rgba(24,213,255,.34);
+      box-shadow: 0 24px 60px rgba(0,0,0,.28), 0 0 0 1px rgba(24,213,255,.08);
+    }
+    .journey-step-phase {
+      display: inline-flex;
+      align-items: center;
+      padding: .38rem .72rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color: #D5DEFF;
+      font-size: .75rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .journey-step h3 {
+      margin: 12px 0 10px;
+      font-size: 1.08rem;
+      line-height: 1.35;
+    }
+    .journey-step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+    .journey-step .tag-row { margin-top: 14px; }
+
     /* ─── CARDS ─── */
     .cards-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
     .cards-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -587,6 +812,10 @@
       .section { padding: 78px 0; }
       .section-head { align-items: start; flex-direction: column; }
       .hero h1 { max-width: 14ch; }
+      .journey-heading { align-items: start; flex-direction: column; }
+      .journey-shell { grid-template-columns: 1fr; }
+      .journey-stage-wrap { position: static; }
+      .journey-visual-card { min-height: 520px; }
     }
     @media (max-width: 760px) {
       .nav-links {
@@ -613,6 +842,26 @@
       .hero { padding-top: 48px; }
       .hero-stats { grid-template-columns: 1fr; }
       .hero h1 { font-size: clamp(2.4rem, 13vw, 4.6rem); }
+      .hero-journey { margin-top: 28px; }
+      .journey-visual-card {
+        min-height: 430px;
+        padding: 22px;
+      }
+      .journey-grid, .journey-stage { min-height: 360px; }
+      .journey-portrait-frame { width: min(100%, 290px); }
+      .journey-clone { width: min(54%, 180px); }
+      .journey-caption {
+        left: 22px;
+        right: 22px;
+        bottom: 20px;
+      }
+      .journey-caption strong { font-size: 1rem; }
+      .journey-roadmap { padding-left: 24px; }
+      .journey-step {
+        padding: 18px 16px 16px 20px;
+        border-radius: 20px;
+      }
+      .journey-step::before { left: -22px; }
       .project-media { height: 180px; }
       .cursor-glow { display: none; }
     }
@@ -731,6 +980,102 @@
           </div>
         </aside>
       </div>
+
+      <section class="container hero-journey" aria-labelledby="journeyTitle">
+        <div class="journey-heading">
+          <div>
+            <span class="journey-kicker">GitHub-inspired roadmap</span>
+            <h2 id="journeyTitle">Future goals, tech exploration, and the next Suvam build arc</h2>
+          </div>
+          <p>
+            This timeline is shaped from the direction visible on your public GitHub profile: stronger
+            full-stack execution, secure auth systems, AI-integrated products, deeper cloud engineering,
+            and production-level software thinking.
+          </p>
+        </div>
+
+        <div class="journey-shell">
+          <div class="journey-stage-wrap">
+            <div class="journey-visual-card glass">
+              <div class="journey-grid">
+                <div class="journey-stage">
+                  <img class="journey-clone" src="./images/avatar-clone-glass.png" alt="" aria-hidden="true" />
+                  <div class="journey-portrait-frame" id="journeyRotor">
+                    <img class="journey-portrait" src="./images/avatar-portrait-cutout.png" alt="Portrait artwork of Suvam Paul" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="journey-caption">
+                <span>Scroll reveal</span>
+                <strong>Portrait rotates toward a 90 degree side turn while the roadmap opens on the right.</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="journey-roadmap" id="journeyTimeline">
+            <article class="journey-step is-active">
+              <span class="journey-step-phase">01. Now</span>
+              <h3>Master the modern full-stack core</h3>
+              <p>
+                Keep sharpening MERN, Next.js, and TypeScript so polished frontend execution stays matched
+                by dependable backend logic and product-level delivery.
+              </p>
+              <div class="tag-row">
+                <span>React</span><span>Next.js</span><span>TypeScript</span><span>Node.js</span>
+              </div>
+            </article>
+
+            <article class="journey-step">
+              <span class="journey-step-phase">02. Secure systems</span>
+              <h3>Build trusted authentication and workflow layers</h3>
+              <p>
+                Push deeper into JWT, OAuth, roles, sessions, and caching so future apps feel secure,
+                intentional, and ready for real users.
+              </p>
+              <div class="tag-row">
+                <span>JWT</span><span>OAuth</span><span>Roles</span><span>Redis</span>
+              </div>
+            </article>
+
+            <article class="journey-step">
+              <span class="journey-step-phase">03. AI products</span>
+              <h3>Embed intelligence into real-world workflows</h3>
+              <p>
+                Expand the builder lane visible on GitHub through AI OS assistants, medical systems,
+                healthcare integrations, and assistants that solve practical user pain.
+              </p>
+              <div class="tag-row">
+                <span>GenAI</span><span>LangChain</span><span>Vector DBs</span><span>Automation</span>
+              </div>
+            </article>
+
+            <article class="journey-step">
+              <span class="journey-step-phase">04. Cloud scale</span>
+              <h3>Level up cloud-native architecture</h3>
+              <p>
+                Grow from shipping apps to operating systems at scale with AWS, Docker, Kubernetes,
+                GraphQL, observability, and cleaner service boundaries.
+              </p>
+              <div class="tag-row">
+                <span>AWS</span><span>Docker</span><span>Kubernetes</span><span>GraphQL</span>
+              </div>
+            </article>
+
+            <article class="journey-step">
+              <span class="journey-step-phase">05. Long-term goal</span>
+              <h3>Land on production-level AI-integrated full-stack systems</h3>
+              <p>
+                The end state is clear: build intelligent systems that look polished, run reliably,
+                and create visible impact across healthcare, developer tooling, and productivity.
+              </p>
+              <div class="tag-row">
+                <span>System Design</span><span>Open Source</span><span>Health Tech</span><span>Product Thinking</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
     </main>
 
     <div class="section-divider"></div>
@@ -1254,6 +1599,92 @@
         }
       });
     });
+
+    const journeySection = document.querySelector('.hero-journey');
+    if (journeySection) {
+      const journeyRotor = journeySection.querySelector('#journeyRotor');
+      const journeyPortrait = journeySection.querySelector('.journey-portrait');
+      const journeyClone = journeySection.querySelector('.journey-clone');
+      const journeyRoadmap = journeySection.querySelector('#journeyTimeline');
+      const journeySteps = journeySection.querySelectorAll('.journey-step');
+
+      ScrollTrigger.matchMedia({
+        '(min-width: 761px)': function() {
+          gsap.set(journeyClone, { opacity: 0.18, scale: 0.88, x: -18 });
+          gsap.set(journeyRoadmap, { opacity: 0.55, x: 42 });
+
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: journeySection,
+              start: 'top 74%',
+              end: 'bottom 48%',
+              scrub: 1
+            }
+          })
+            .to(journeyRotor, { rotateY: -88, x: -56, duration: 1 }, 0)
+            .to(journeyPortrait, { opacity: 0.32, duration: 0.85 }, 0)
+            .to(journeyClone, { opacity: 0.94, scale: 1.04, x: 0, duration: 1 }, 0.08)
+            .to(journeyRoadmap, { opacity: 1, x: 0, duration: 0.92 }, 0.2);
+        },
+        '(max-width: 760px)': function() {
+          gsap.fromTo(journeyRoadmap,
+            { opacity: 0, y: 22 },
+            {
+              opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
+              scrollTrigger: {
+                trigger: journeySection,
+                start: 'top 84%',
+                toggleActions: 'play none none none'
+              }
+            }
+          );
+
+          gsap.fromTo(journeyClone,
+            { opacity: 0.12, scale: 0.9 },
+            {
+              opacity: 0.78, scale: 1, duration: 0.8, ease: 'power2.out',
+              scrollTrigger: {
+                trigger: journeySection,
+                start: 'top 82%',
+                toggleActions: 'play none none none'
+              }
+            }
+          );
+        }
+      });
+
+      journeySteps.forEach((step, index) => {
+        gsap.fromTo(step,
+          { opacity: index === 0 ? 1 : 0.2, y: index === 0 ? 0 : 24 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.65,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: step,
+              start: 'top 86%',
+              toggleActions: 'play none none reverse'
+            }
+          }
+        );
+
+        ScrollTrigger.create({
+          trigger: step,
+          start: 'top 58%',
+          end: 'bottom 45%',
+          onToggle: self => {
+            step.classList.toggle('is-active', self.isActive);
+            gsap.to(step, {
+              x: self.isActive ? 6 : 0,
+              duration: 0.28,
+              ease: 'power2.out',
+              overwrite: 'auto'
+            });
+          }
+        });
+      });
+    }
 
     /* ══════════════════════════════════════════════
        4. TYPED TEXT EFFECT
