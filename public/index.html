@@ -1618,10 +1618,10 @@
           if (img.dataset.fallbackApplied === 'true') {
             return;
           }
+          img.dataset.fallbackApplied = 'true';
 
           const localSrc = img.getAttribute('data-local-src');
           if (localSrc && img.getAttribute('src') !== localSrc) {
-            img.dataset.fallbackApplied = 'true';
             console.warn(
               'Journey section image failed to load, falling back to local path:',
               { className: img.className, failedSrc: img.getAttribute('src') }
