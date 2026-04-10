@@ -508,9 +508,7 @@
       transform-origin: center bottom;
       opacity: .2;
       mix-blend-mode: screen;
-      filter:
-        hue-rotate(185deg) saturate(1.22) brightness(1.18) contrast(1.06)
-        drop-shadow(0 20px 46px rgba(24,213,255,.3));
+      filter: hue-rotate(185deg) saturate(1.22) brightness(1.18) contrast(1.06) drop-shadow(0 20px 46px rgba(24,213,255,.3));
       -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0) 2%, rgba(0,0,0,.78) 35%, rgba(0,0,0,.9) 100%);
       mask-image: linear-gradient(180deg, rgba(0,0,0,0) 2%, rgba(0,0,0,.78) 35%, rgba(0,0,0,.9) 100%);
       pointer-events: none;
@@ -1615,22 +1613,27 @@
 
       journeyImages.forEach(img => {
         const handleJourneyImageError = () => {
-          img.removeEventListener('error', handleJourneyImageError);
-          if (img.dataset.fallbackApplied === 'true') {
-            return;
-          }
-          img.dataset.fallbackApplied = 'true';
-
           const failedSrc = img.getAttribute('src');
           const localSrc = img.getAttribute('data-local-src');
-          if (localSrc && failedSrc !== localSrc) {
+          const fallbackTried = img.dataset.fallbackApplied === 'true';
+
+          if (!fallbackTried && localSrc && failedSrc !== localSrc) {
+            img.dataset.fallbackApplied = 'true';
             console.warn(
               'Journey section image failed to load, falling back to local path:',
               { className: img.className, failedSrc }
             );
             img.src = localSrc;
+            return;
+          }
+
+          img.removeEventListener('error', handleJourneyImageError);
+          if (!localSrc) {
+            console.error('Journey section image failed and no fallback path was provided:', { className: img.className, failedSrc });
+          } else if (failedSrc === localSrc) {
+            console.error('Journey section image fallback also failed to load:', { className: img.className, failedSrc });
           } else {
-            console.error('Journey section image failed and no valid fallback remained:', { className: img.className, failedSrc });
+            console.error('Journey section image failed after fallback attempt:', { className: img.className, failedSrc });
           }
         };
 
