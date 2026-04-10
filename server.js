@@ -3,11 +3,10 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const {
-  disconnectPrisma,
+  closeDatabasePool,
   getHealthPayload,
   getMissingEnv,
-  handleContactRequest,
-  verifyServices
+  handleContactRequest
 } = require("./lib/contact-service");
 
 const app = express();
@@ -42,8 +41,6 @@ async function bootstrap() {
     );
   }
 
-  await verifyServices();
-
   app.listen(port, () => {
     console.log(`Portfolio server running at http://localhost:${port}`);
   });
@@ -52,7 +49,7 @@ async function bootstrap() {
 bootstrap();
 
 async function shutdown() {
-  await disconnectPrisma();
+  await closeDatabasePool();
   process.exit(0);
 }
 
