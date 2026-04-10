@@ -501,14 +501,17 @@
     }
     .journey-clone {
       position: absolute;
-      left: 50%;
+      left: 52%;
       bottom: 6px;
-      width: min(56%, 230px);
-      transform: translateX(-86%) scale(.88);
+      width: min(62%, 250px);
+      transform: translateX(-84%) scale(.9) rotateY(-12deg);
       transform-origin: center bottom;
-      opacity: .12;
+      opacity: .2;
       mix-blend-mode: screen;
-      filter: saturate(1.1) brightness(1.08) drop-shadow(0 18px 42px rgba(24,213,255,.18));
+      filter: hue-rotate(185deg) saturate(1.22) brightness(1.18) contrast(1.06)
+              drop-shadow(0 20px 46px rgba(24,213,255,.3));
+      -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0) 2%, rgba(0,0,0,.78) 35%, rgba(0,0,0,.9) 100%);
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0) 2%, rgba(0,0,0,.78) 35%, rgba(0,0,0,.9) 100%);
       pointer-events: none;
       z-index: 1;
     }
@@ -849,7 +852,7 @@
       }
       .journey-grid, .journey-stage { min-height: 360px; }
       .journey-portrait-frame { width: min(100%, 290px); }
-      .journey-clone { width: min(54%, 180px); }
+      .journey-clone { width: min(56%, 190px); }
       .journey-caption {
         left: 22px;
         right: 22px;
@@ -999,9 +1002,9 @@
             <div class="journey-visual-card glass">
               <div class="journey-grid">
                 <div class="journey-stage">
-                  <img class="journey-clone" src="./images/avatar-clone-glass.png" alt="" aria-hidden="true" />
+                  <img class="journey-clone" src="/images/avatar-portrait-cutout.png" data-local-src="./images/avatar-portrait-cutout.png" alt="" aria-hidden="true" />
                   <div class="journey-portrait-frame" id="journeyRotor">
-                    <img class="journey-portrait" src="./images/avatar-portrait-cutout.png" alt="Portrait artwork of Suvam Paul" />
+                    <img class="journey-portrait" src="/images/avatar-portrait-cutout.png" data-local-src="./images/avatar-portrait-cutout.png" alt="Portrait artwork of Suvam Paul" />
                   </div>
                 </div>
               </div>
@@ -1607,6 +1610,16 @@
       const journeyClone = journeySection.querySelector('.journey-clone');
       const journeyRoadmap = journeySection.querySelector('#journeyTimeline');
       const journeySteps = journeySection.querySelectorAll('.journey-step');
+      const journeyImages = journeySection.querySelectorAll('img[data-local-src]');
+
+      journeyImages.forEach(img => {
+        img.addEventListener('error', () => {
+          const localSrc = img.getAttribute('data-local-src');
+          if (localSrc && img.getAttribute('src') !== localSrc) {
+            img.src = localSrc;
+          }
+        }, { once: true });
+      });
 
       ScrollTrigger.matchMedia({
         '(min-width: 761px)': function() {
