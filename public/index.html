@@ -1614,13 +1614,20 @@
 
       journeyImages.forEach(img => {
         img.addEventListener('error', () => {
+          if (img.dataset.fallbackApplied === 'true') {
+            return;
+          }
+
           const localSrc = img.getAttribute('data-local-src');
-          if (localSrc) {
+          if (localSrc && img.getAttribute('src') !== localSrc) {
+            img.dataset.fallbackApplied = 'true';
             console.warn(
               'Journey section image failed to load, falling back to local path:',
               { className: img.className, failedSrc: img.getAttribute('src') }
             );
             img.src = localSrc;
+          } else {
+            console.error('Journey section image failed and no valid fallback remained:', { className: img.className, failedSrc: img.getAttribute('src') });
           }
         }, { once: true });
       });
