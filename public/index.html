@@ -1614,23 +1614,27 @@
       const journeyImages = journeySection.querySelectorAll('img[data-local-src]');
 
       journeyImages.forEach(img => {
-        img.addEventListener('error', () => {
+        const handleJourneyImageError = () => {
+          img.removeEventListener('error', handleJourneyImageError);
           if (img.dataset.fallbackApplied === 'true') {
             return;
           }
           img.dataset.fallbackApplied = 'true';
 
+          const failedSrc = img.getAttribute('src');
           const localSrc = img.getAttribute('data-local-src');
-          if (localSrc && img.getAttribute('src') !== localSrc) {
+          if (localSrc && failedSrc !== localSrc) {
             console.warn(
               'Journey section image failed to load, falling back to local path:',
-              { className: img.className, failedSrc: img.getAttribute('src') }
+              { className: img.className, failedSrc }
             );
             img.src = localSrc;
           } else {
-            console.error('Journey section image failed and no valid fallback remained:', { className: img.className, failedSrc: img.getAttribute('src') });
+            console.error('Journey section image failed and no valid fallback remained:', { className: img.className, failedSrc });
           }
-        });
+        };
+
+        img.addEventListener('error', handleJourneyImageError);
       });
 
       ScrollTrigger.matchMedia({
