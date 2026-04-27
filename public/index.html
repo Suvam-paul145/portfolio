@@ -1533,7 +1533,7 @@
               <div class="journey-grid">
                 <div class="journey-stage">
                   <div class="journey-video-shell">
-                    <video class="journey-video" id="journeyScrollVideo" muted playsinline webkit-playsinline
+                    <video class="journey-video" id="journeyScrollVideo" muted autoplay loop playsinline webkit-playsinline
                       preload="auto" disablePictureInPicture disableRemotePlayback tabindex="-1"
                       controlslist="nodownload noplaybackrate noremoteplayback nofullscreen" aria-hidden="true">
                       <source src="/video/D_Avatar_Scroll_Video_Generation.mp4" type="video/mp4" />
@@ -1543,8 +1543,8 @@
               </div>
 
               <div class="journey-caption">
-                <span>Scroll-synced video</span>
-                <strong>The avatar video scrubs frame-by-frame with your scroll while the roadmap opens on the right.</strong>
+                <span>Looping video</span>
+                <strong>The avatar video now plays continuously in an infinite loop without any scroll-based playback.</strong>
               </div>
             </div>
           </div>
@@ -2154,116 +2154,8 @@
       if (journeySection) {
         const journeyStage = journeySection.querySelector('.journey-stage');
         const journeyVideo = journeySection.querySelector('#journeyScrollVideo');
-        const journeyVideoShell = journeySection.querySelector('.journey-video-shell');
         const journeyRoadmap = journeySection.querySelector('#journeyTimeline');
         const journeySteps = journeySection.querySelectorAll('.journey-step');
-        let journeyVideoTrigger;
-        let journeyVideoDuration = 0;
-        let journeyLastVideoTime = -1;
-        let journeyTargetVideoTime = 0;
-        let journeySmoothVideoTime = 0;
-        let journeyVideoRafId = 0;
-        const JOURNEY_FRAME_EPSILON = 1 / 120;
-        const JOURNEY_VIDEO_SMOOTHING = 0.28;
-        const JOURNEY_SCROLL_START = 'top 70%';
-        const JOURNEY_SCROLL_END = 'bottom 40%';
-
-        const stopJourneyVideoLoop = () => {
-          if (!journeyVideoRafId) {
-            return;
-          }
-
-          cancelAnimationFrame(journeyVideoRafId);
-          journeyVideoRafId = 0;
-        };
-
-        const setJourneyVideoTime = (nextTime) => {
-          if (!journeyVideo || !Number.isFinite(nextTime)) {
-            return;
-          }
-
-          const boundedTime = gsap.utils.clamp(0, journeyVideoDuration || journeyVideo.duration || 0, nextTime);
-          if (Math.abs(boundedTime - journeyLastVideoTime) < JOURNEY_FRAME_EPSILON) {
-            return;
-          }
-
-          journeyVideo.currentTime = boundedTime;
-          journeyLastVideoTime = boundedTime;
-          journeySmoothVideoTime = boundedTime;
-        };
-
-        const tickJourneyVideoFrame = () => {
-          journeyVideoRafId = 0;
-
-          if (!journeyVideoDuration) {
-            return;
-          }
-
-          const delta = journeyTargetVideoTime - journeySmoothVideoTime;
-          if (Math.abs(delta) <= JOURNEY_FRAME_EPSILON) {
-            setJourneyVideoTime(journeyTargetVideoTime);
-            stopJourneyVideoLoop();
-            return;
-          }
-
-          const nextTime = journeySmoothVideoTime + (delta * JOURNEY_VIDEO_SMOOTHING);
-          setJourneyVideoTime(nextTime);
-          journeyVideoRafId = requestAnimationFrame(tickJourneyVideoFrame);
-        };
-
-        const queueJourneyVideoTime = (nextTime, { immediate = false } = {}) => {
-          if (!journeyVideoDuration) {
-            return;
-          }
-
-          journeyTargetVideoTime = gsap.utils.clamp(0, journeyVideoDuration, nextTime);
-
-          if (immediate) {
-            stopJourneyVideoLoop();
-            setJourneyVideoTime(journeyTargetVideoTime);
-            return;
-          }
-
-          if (!journeyVideoRafId) {
-            journeyVideoRafId = requestAnimationFrame(tickJourneyVideoFrame);
-          }
-        };
-
-        const initJourneyVideoScroll = () => {
-          if (!journeyVideo || !journeyVideo.duration || Number.isNaN(journeyVideo.duration)) {
-            return;
-          }
-
-          journeyVideoDuration = journeyVideo.duration;
-          journeyVideo.pause();
-          journeyStage?.classList.add('is-video-ready');
-          queueJourneyVideoTime(0, { immediate: true });
-
-          if (journeyVideoTrigger) {
-            journeyVideoTrigger.kill();
-          }
-
-          journeyVideoTrigger = ScrollTrigger.create({
-            trigger: journeySection,
-            start: JOURNEY_SCROLL_START,
-            end: JOURNEY_SCROLL_END,
-            invalidateOnRefresh: true,
-            onUpdate: self => {
-              queueJourneyVideoTime(self.progress * journeyVideoDuration);
-            },
-            onRefresh: self => {
-              queueJourneyVideoTime(self.progress * journeyVideoDuration, { immediate: true });
-            },
-            onLeaveBack: () => {
-              queueJourneyVideoTime(0, { immediate: true });
-            },
-            onLeave: () => {
-              queueJourneyVideoTime(journeyVideoDuration, { immediate: true });
-            }
-          });
-
-          ScrollTrigger.refresh();
-        };
 
         if (journeyVideo) {
           journeyVideo.controls = false;
@@ -2271,24 +2163,18 @@
           journeyVideo.defaultMuted = true;
           journeyVideo.playsInline = true;
           journeyVideo.preload = 'auto';
-
-          const handleJourneyVideoReady = () => {
-            if (!journeyVideo.duration || Number.isNaN(journeyVideo.duration)) {
-              return;
-            }
-
-            initJourneyVideoScroll();
-          };
+          journeyVideo.loop = true;
+          journeyVideo.autoplay = true;
 
           const revealJourneyVideo = () => {
             journeyStage?.classList.add('is-video-ready');
+            const playPromise = journeyVideo.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+              playPromise.catch(() => {
+                console.warn('Journey loop video could not autoplay immediately.');
+              });
+            }
           };
-
-          if (journeyVideo.readyState >= 1) {
-            handleJourneyVideoReady();
-          } else {
-            journeyVideo.addEventListener('loadedmetadata', handleJourneyVideoReady, { once: true });
-          }
 
           if (journeyVideo.readyState >= 2) {
             revealJourneyVideo();
@@ -2297,7 +2183,7 @@
           }
 
           journeyVideo.addEventListener('error', () => {
-            console.error('Journey scroll video failed to load:', journeyVideo.currentSrc || journeyVideo.src);
+            console.error('Journey loop video failed to load:', journeyVideo.currentSrc || journeyVideo.src);
           }, { once: true });
 
           journeyVideo.addEventListener('contextmenu', event => {
@@ -2307,19 +2193,17 @@
 
         ScrollTrigger.matchMedia({
           '(min-width: 761px)': function () {
-            gsap.set(journeyVideoShell, { opacity: 0.4, scale: 0.94, y: 18 });
             gsap.set(journeyRoadmap, { opacity: 0.55, x: 42 });
 
             gsap.timeline({
               scrollTrigger: {
                 trigger: journeySection,
-                start: JOURNEY_SCROLL_START,
-                end: JOURNEY_SCROLL_END,
+                start: 'top 70%',
+                end: 'bottom 40%',
                 scrub: true
               }
             })
-              .to(journeyVideoShell, { opacity: 1, scale: 1, y: 0, duration: 1 }, 0)
-              .to(journeyRoadmap, { opacity: 1, x: 0, duration: 0.92 }, 0.2);
+              .to(journeyRoadmap, { opacity: 1, x: 0, duration: 0.92 }, 0);
           },
           '(max-width: 760px)': function () {
             gsap.fromTo(journeyRoadmap,
@@ -2329,18 +2213,6 @@
                 scrollTrigger: {
                   trigger: journeySection,
                   start: 'top 84%',
-                  toggleActions: 'play none none none'
-                }
-              }
-            );
-
-            gsap.fromTo(journeyVideoShell,
-              { opacity: 0.24, scale: 0.95, y: 18 },
-              {
-                opacity: 1, scale: 1, y: 0, duration: 0.8, ease: 'power2.out',
-                scrollTrigger: {
-                  trigger: journeySection,
-                  start: 'top 82%',
                   toggleActions: 'play none none none'
                 }
               }
