@@ -1868,7 +1868,7 @@
         <div class="contact">
           <div class="card gs-reveal">
             <h3>Send a message</h3>
-            <p style="margin-bottom:18px;">Messages submitted here are stored securely in Supabase so I can review and
+            <p style="margin-bottom:18px;">Messages submitted here are delivered to my inbox and backed up in Supabase so I can review and
                 reply to them directly.</p>
 
             <form id="contactForm">
@@ -2158,23 +2158,75 @@
         const journeyRoadmap = journeySection.querySelector('#journeyTimeline');
         const journeySteps = journeySection.querySelectorAll('.journey-step');
         let journeyVideoTrigger;
+        let journeyVideoDuration = 0;
         let journeyLastVideoTime = -1;
-        const JOURNEY_FRAME_EPSILON = 1 / 60;
+        let journeyTargetVideoTime = 0;
+        let journeySmoothVideoTime = 0;
+        let journeyVideoRafId = 0;
+        const JOURNEY_FRAME_EPSILON = 1 / 120;
+        const JOURNEY_VIDEO_SMOOTHING = 0.28;
         const JOURNEY_SCROLL_START = 'top 70%';
         const JOURNEY_SCROLL_END = 'bottom 40%';
+
+        const stopJourneyVideoLoop = () => {
+          if (!journeyVideoRafId) {
+            return;
+          }
+
+          cancelAnimationFrame(journeyVideoRafId);
+          journeyVideoRafId = 0;
+        };
 
         const setJourneyVideoTime = (nextTime) => {
           if (!journeyVideo || !Number.isFinite(nextTime)) {
             return;
           }
 
-          const boundedTime = gsap.utils.clamp(0, journeyVideo.duration || 0, nextTime);
+          const boundedTime = gsap.utils.clamp(0, journeyVideoDuration || journeyVideo.duration || 0, nextTime);
           if (Math.abs(boundedTime - journeyLastVideoTime) < JOURNEY_FRAME_EPSILON) {
             return;
           }
 
           journeyVideo.currentTime = boundedTime;
           journeyLastVideoTime = boundedTime;
+          journeySmoothVideoTime = boundedTime;
+        };
+
+        const tickJourneyVideoFrame = () => {
+          journeyVideoRafId = 0;
+
+          if (!journeyVideoDuration) {
+            return;
+          }
+
+          const delta = journeyTargetVideoTime - journeySmoothVideoTime;
+          if (Math.abs(delta) <= JOURNEY_FRAME_EPSILON) {
+            setJourneyVideoTime(journeyTargetVideoTime);
+            stopJourneyVideoLoop();
+            return;
+          }
+
+          const nextTime = journeySmoothVideoTime + (delta * JOURNEY_VIDEO_SMOOTHING);
+          setJourneyVideoTime(nextTime);
+          journeyVideoRafId = requestAnimationFrame(tickJourneyVideoFrame);
+        };
+
+        const queueJourneyVideoTime = (nextTime, { immediate = false } = {}) => {
+          if (!journeyVideoDuration) {
+            return;
+          }
+
+          journeyTargetVideoTime = gsap.utils.clamp(0, journeyVideoDuration, nextTime);
+
+          if (immediate) {
+            stopJourneyVideoLoop();
+            setJourneyVideoTime(journeyTargetVideoTime);
+            return;
+          }
+
+          if (!journeyVideoRafId) {
+            journeyVideoRafId = requestAnimationFrame(tickJourneyVideoFrame);
+          }
         };
 
         const initJourneyVideoScroll = () => {
@@ -2182,10 +2234,10 @@
             return;
           }
 
+          journeyVideoDuration = journeyVideo.duration;
           journeyVideo.pause();
-          journeyVideo.currentTime = 0;
-          journeyLastVideoTime = 0;
           journeyStage?.classList.add('is-video-ready');
+          queueJourneyVideoTime(0, { immediate: true });
 
           if (journeyVideoTrigger) {
             journeyVideoTrigger.kill();
@@ -2197,10 +2249,16 @@
             end: JOURNEY_SCROLL_END,
             invalidateOnRefresh: true,
             onUpdate: self => {
-              setJourneyVideoTime(self.progress * journeyVideo.duration);
+              queueJourneyVideoTime(self.progress * journeyVideoDuration);
             },
             onRefresh: self => {
-              setJourneyVideoTime(self.progress * journeyVideo.duration);
+              queueJourneyVideoTime(self.progress * journeyVideoDuration, { immediate: true });
+            },
+            onLeaveBack: () => {
+              queueJourneyVideoTime(0, { immediate: true });
+            },
+            onLeave: () => {
+              queueJourneyVideoTime(journeyVideoDuration, { immediate: true });
             }
           });
 
@@ -2211,6 +2269,8 @@
           journeyVideo.controls = false;
           journeyVideo.muted = true;
           journeyVideo.defaultMuted = true;
+          journeyVideo.playsInline = true;
+          journeyVideo.preload = 'auto';
 
           const handleJourneyVideoReady = () => {
             if (!journeyVideo.duration || Number.isNaN(journeyVideo.duration)) {
