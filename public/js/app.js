@@ -1,6 +1,8 @@
 import {
+  certifications,
   credentials,
   futurePlans,
+  hobbies,
   mission,
   projects,
   skillGroups,
@@ -66,6 +68,31 @@ function renderFuture() {
     .join("");
 }
 
+function renderSignalGrid({ targetId, items, metaLabel }) {
+  const target = document.getElementById(targetId);
+  if (!target) return;
+
+  target.innerHTML = items
+    .map(
+      (item, index) => `
+        <article class="signal-card" data-motion="float">
+          <div class="signal-header">
+            <span class="signal-index">${String(index + 1).padStart(2, "0")}</span>
+            <span class="signal-meta">${item.issuer || metaLabel}</span>
+          </div>
+          <h3>${item.title}</h3>
+          <p>${item.detail}</p>
+        </article>
+      `
+    )
+    .join("");
+}
+
+function renderSignals() {
+  renderSignalGrid({ targetId: "certGrid", items: certifications, metaLabel: "Certification" });
+  renderSignalGrid({ targetId: "hobbyGrid", items: hobbies, metaLabel: "Hobby" });
+}
+
 function initNavigation() {
   const nav = document.getElementById("siteNav");
   const toggle = document.getElementById("navToggle");
@@ -117,6 +144,7 @@ renderMission();
 renderProjects(projects);
 renderBlueprint({ skillGroups, credentials, projects });
 renderVanguard();
+renderSignals();
 renderFuture();
 
 initNavigation();

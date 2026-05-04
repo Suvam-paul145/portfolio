@@ -21,6 +21,7 @@ export function initScroll({ engine } = {}) {
   initHorizontalLab({ gsap, ScrollTrigger, reducedMotion });
   initBlueprintLines({ gsap, ScrollTrigger });
   initVanguardBatch({ gsap, ScrollTrigger, reducedMotion });
+  initSignalCards({ gsap, ScrollTrigger, reducedMotion });
   initFuture({ gsap, ScrollTrigger, engine });
   initActiveNav({ ScrollTrigger });
 
@@ -234,6 +235,35 @@ function initVanguardBatch({ gsap, ScrollTrigger, reducedMotion }) {
           ease: "power3.out"
         }
       );
+    }
+  });
+}
+
+function initSignalCards({ gsap, ScrollTrigger, reducedMotion }) {
+  if (reducedMotion) return;
+
+  const cards = gsap.utils.toArray(".signal-card");
+  if (!cards.length) return;
+
+  ScrollTrigger.batch(cards, {
+    start: "top 90%",
+    onEnter: (batch) => {
+      gsap.fromTo(
+        batch,
+        { opacity: 0, y: 44, rotateX: -6, scale: 0.97 },
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          scale: 1,
+          duration: 0.9,
+          stagger: 0.12,
+          ease: "power4.out"
+        }
+      );
+    },
+    onLeaveBack: (batch) => {
+      gsap.to(batch, { opacity: 0, y: 24, duration: 0.4, ease: "power2.out" });
     }
   });
 }

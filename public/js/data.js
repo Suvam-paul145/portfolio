@@ -232,6 +232,35 @@ export const credentials = [
   }
 ];
 
+export const certifications = [
+  {
+    title: "AWA Cloud Foundations",
+    issuer: "Cloud Foundations",
+    detail: "Cloud fundamentals, core services, and deployment basics."
+  },
+  {
+    title: "IIT Kharagpur Certified in Java language",
+    issuer: "IIT Kharagpur",
+    detail: "Java fundamentals, object-oriented programming, and core language features."
+  },
+  {
+    title: "Google Data Analyst using GCP",
+    issuer: "Google",
+    detail: "Data analysis workflows and cloud-based analytics on GCP."
+  }
+];
+
+export const hobbies = [
+  {
+    title: "Technical Blog Writer",
+    detail: "Publishing build breakdowns, system design notes, and learning logs."
+  },
+  {
+    title: "Personality development through reading",
+    detail: "Consistent reading that sharpens communication, empathy, and leadership."
+  }
+];
+
 export const vanguardItems = [
   {
     type: "Open source",
