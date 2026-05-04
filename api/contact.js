@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const { handleContactRequest } = require("../lib/contact-service");
 
 module.exports = async (req, res) => {
